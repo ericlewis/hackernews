@@ -1,34 +1,33 @@
 import React from 'react';
-import { FlatList, Text } from 'react-native';
-
+import { FlatList } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Feed from './screens/Feed';
 import Comments from './screens/Comments';
-
+import WebBrowser from './screens/WebBrowser';
 import FeedCell from './components/FeedCell';
 
-class HomeScreen extends React.Component {
-	feeds = [
-		{ key: 'Top', endpoint: 'topstories' },
-		{ key: 'New', endpoint: 'newstories' },
-		{ key: 'Best', endpoint: 'beststories' },
-		{ key: 'Ask', endpoint: 'askstories' },
-		{ key: 'Show', endpoint: 'showstories' },
-		{ key: 'Jobs', endpoint: 'jobstories' },
-	];
+const feeds = [
+	{ key: 'Top', endpoint: 'topstories' },
+	{ key: 'New', endpoint: 'newstories' },
+	{ key: 'Best', endpoint: 'beststories' },
+	{ key: 'Ask', endpoint: 'askstories' },
+	{ key: 'Show', endpoint: 'showstories' },
+	{ key: 'Jobs', endpoint: 'jobstories' },
+];
 
+class HomeScreen extends React.Component {
 	static navigationOptions = {
 		title: 'Feeds',
 	};
 
 	componentWillMount() {
-		this.props.navigation.navigate('Feed', this.feeds[0]);
+		this.props.navigation.navigate('Feed', feeds[0]);
 	}
 
 	render() {
 		return (
 			<FlatList
-				data={this.feeds}
+				data={feeds}
 				renderItem={({ item }) => (
 					<FeedCell
 						item={item}
@@ -49,5 +48,8 @@ export default StackNavigator({
 	},
 	Comments: {
 		screen: Comments,
+	},
+	WebBrowser: {
+		screen: WebBrowser,
 	},
 });

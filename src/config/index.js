@@ -6,3 +6,4 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+export const api = firebase.database().ref('v0/');

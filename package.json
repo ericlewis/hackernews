@@ -1,31 +1,59 @@
 {
-  "name": "newsyc",
-  "version": "0.1.0",
-  "private": true,
-  "devDependencies": {
-    "jest-expo": "^22.0.0",
-    "react-native-scripts": "1.7.0",
-    "react-test-renderer": "16.0.0-beta.5"
-  },
-  "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
-  "scripts": {
-    "start": "react-native-scripts start",
-    "eject": "react-native-scripts eject",
-    "android": "react-native-scripts android",
-    "ios": "react-native-scripts ios",
-    "test": "node node_modules/jest/bin/jest.js --watch"
-  },
-  "jest": {
-    "preset": "jest-expo"
-  },
-  "dependencies": {
-    "expo": "^22.0.2",
-    "firebase": "^4.6.2",
-    "react": "16.0.0-beta.5",
-    "react-native": "^0.49.5",
-    "react-native-htmlview": "^0.12.1",
-    "react-navigation": "^1.0.0-beta.19",
-    "url-parse": "^1.2.0",
-    "vague-time": "^2.4.1"
-  }
+	"name": "newsyc",
+	"version": "0.1.0",
+	"private": true,
+	"devDependencies": {
+		"babel-eslint": "^8.0.3",
+		"eslint": "^4.13.1",
+		"eslint-config-airbnb": "^16.1.0",
+		"eslint-config-prettier": "^2.9.0",
+		"eslint-import-resolver-babel-module": "^4.0.0",
+		"eslint-plugin-import": "^2.8.0",
+		"eslint-plugin-jsx-a11y": "^6.0.3",
+		"eslint-plugin-prettier": "^2.4.0",
+		"eslint-plugin-react": "^7.5.1",
+		"eslint-plugin-react-native": "^3.2.0",
+		"eslint-plugin-rulesdir": "^0.1.0",
+		"jest-expo": "^22.0.0",
+		"lint-staged": "^6.0.0",
+		"prettier": "^1.8.2",
+		"react-test-renderer": "16.0.0-beta.5"
+	},
+	"main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
+	"scripts": {
+		"start": "react-native-scripts start",
+		"eject": "react-native-scripts eject",
+		"android": "react-native-scripts android",
+		"ios": "react-native-scripts ios",
+		"test": "node node_modules/jest/bin/jest.js --watch",
+		"precommit": "lint-staged"
+	},
+	"jest": {
+		"preset": "jest-expo"
+	},
+	"lint-staged": {
+		"+(package.json|yarn.lock)": [
+			"node ./scripts/yarn-check.js"
+		],
+		"src/**/*.js": [
+			"eslint"
+		]
+	},
+	"prettier": {
+		"singleQuote": true,
+		"useTabs": true,
+		"jsxBracketSameLine": true,
+		"trailingComma": "all"
+	},
+	"dependencies": {
+		"expo": "^22.0.2",
+		"firebase": "^4.6.2",
+		"pluralize": "^7.0.0",
+		"react": "16.2.0",
+		"react-native": "0.53.0",
+		"react-native-htmlview": "^0.12.1",
+		"react-navigation": "^1.0.0-beta.19",
+		"url-parse": "^1.2.0",
+		"vague-time": "^2.4.1"
+	}
 }
