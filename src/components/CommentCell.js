@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableWithoutFeedback, StyleSheet } from 'react-native';
-import { withNavigation } from 'react-navigation';
 import vagueTime from 'vague-time';
 import HTMLView from 'react-native-htmlview';
+import { ScreenNames } from '../screens';
 import { api } from '../config';
 
 class CommentCell extends Component {
@@ -20,6 +20,8 @@ class CommentCell extends Component {
 		const { comment } = this.state;
 
 		if (comment) {
+			const { navigator } = this.props;
+
 			if (comment.deleted) {
 				return null;
 			}
@@ -40,7 +42,11 @@ class CommentCell extends Component {
 								<HTMLView value={comment.text} onLinkPress={this._handleURL} />
 								{comment.kids &&
 									comment.kids.map(comment => (
-										<CommentCell key={comment} itemID={comment} />
+										<CommentCell
+											key={comment}
+											itemID={comment}
+											navigator={navigator}
+										/>
 									))}
 							</View>
 						) : (
@@ -59,16 +65,6 @@ class CommentCell extends Component {
 		return null;
 	}
 
-	_toggleCollapse = () => {
-		const { collapsed } = this.state;
-		this.setState({ collapsed: !collapsed });
-	};
-
-	_handleURL = url => {
-		const { navigation } = this.props;
-		navigation.navigate('WebBrowser', { url });
-	};
-
 	_setupListener = itemID => {
 		api.child(`item/${itemID}`).on('value', snapshot => {
 			const comment = snapshot.val();
@@ -78,6 +74,18 @@ class CommentCell extends Component {
 
 	_teardownListener = itemID => {
 		api.child(`item/${itemID}`).off();
+	};
+
+	_toggleCollapse = () => {
+		const { collapsed } = this.state;
+		this.setState({ collapsed: !collapsed });
+	};
+
+	_handleURL = url => {
+		this.props.navigator.push({
+			screen: ScreenNames.WebBrowser,
+			passProps: { url },
+		});
 	};
 }
 
@@ -94,4 +102,4 @@ const styles = StyleSheet.create({
 	collapsed: { opacity: 0.4 },
 });
 
-export default withNavigation(CommentCell);
+export default CommentCell;

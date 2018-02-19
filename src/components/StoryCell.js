@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { withNavigation } from 'react-navigation';
 import vagueTime from 'vague-time';
 import parse from 'url-parse';
 import HTMLView from 'react-native-htmlview';
+import { ScreenNames } from '../screens';
 import { api } from '../config';
 
 class StoryCell extends Component {
@@ -94,20 +94,20 @@ class StoryCell extends Component {
 	};
 
 	_pressedStory = () => {
-		const { story } = this.state;
-		this.setState({ read: true });
-		this.props.onPress(story);
+		this.setState({ read: true }, () => this.props.onPress(this.state.story));
 	};
 
 	_pressedComments = () => {
-		const { story } = this.state;
-		this.setState({ read: true });
-		this.props.onPressComments(story);
+		this.setState({ read: true }, () =>
+			this.props.onPressComments(this.state.story),
+		);
 	};
 
 	_pressedURL = url => {
-		const { navigation } = this.props;
-		navigation.navigate('WebBrowser', { url });
+		this.props.navigator.push({
+			screen: ScreenNames.WebBrowser,
+			passProps: { url },
+		});
 	};
 
 	_timeAgo = time =>
@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 17,
 		borderBottomColor: 'white',
 		borderBottomWidth: 1,
+		backgroundColor: '#EEEEEE',
 	},
 	read: {
 		opacity: 0.3,
@@ -154,4 +155,4 @@ const styles = StyleSheet.create({
 	commentCount: { fontWeight: 'bold' },
 });
 
-export default withNavigation(StoryCell);
+export default StoryCell;

@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
 import { FlatList } from 'react-native';
-import pluralize from 'pluralize';
+import { ScreenNames } from '../screens';
 import CommentCell from '../components/CommentCell';
 import StoryCell from '../components/StoryCell';
 import { FooterSpacer } from '../components/FooterSpacer';
 
 class Comments extends Component {
-	static navigationOptions = ({ navigation }) => ({
-		title: pluralize('Comment', navigation.state.params.descendants || 0, true),
-	});
-
 	render() {
-		const story = this.props.navigation.state.params;
+		const { story } = this.props;
 		return (
 			<FlatList
 				data={story.kids}
@@ -34,10 +30,15 @@ class Comments extends Component {
 
 	_key = item => String(item);
 
-	_renderItem = ({ item }) => <CommentCell itemID={item} />;
+	_renderItem = ({ item }) => (
+		<CommentCell itemID={item} navigator={this.props.navigator} />
+	);
 
 	_handlePress = story =>
-		this.props.navigation.navigate('WebBrowser', { story });
+		this.props.navigator.push({
+			screen: ScreenNames.WebBrowser,
+			passProps: { story },
+		});
 }
 
 export default Comments;

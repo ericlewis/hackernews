@@ -1,28 +1,23 @@
 import React, { Component } from 'react';
 import { FlatList } from 'react-native';
+import pluralize from 'pluralize';
 import { api } from '../config';
+import { ScreenNames } from '../screens';
 import StoryCell from '../components/StoryCell';
 
 class Feed extends Component {
 	state = { storyIDs: [] };
 
-	static navigationOptions = ({ navigation }) => ({
-		title: navigation.state.params.key,
-	});
-
 	componentDidMount() {
-		const { endpoint } = this.props.navigation.state.params;
-		this._setupFeedListener(endpoint);
+		this._setupFeedListener();
 	}
 
 	componentWillUnmount() {
-		const { endpoint } = this.props.navigation.state.params;
-		this._teardownFeedListener(endpoint);
+		this._teardownFeedListener();
 	}
 
 	render() {
 		const { storyIDs } = this.state;
-
 		return (
 			<FlatList
 				data={storyIDs}
@@ -32,7 +27,8 @@ class Feed extends Component {
 		);
 	}
 
-	_setupFeedListener(endpoint) {
+	_setupFeedListener() {
+		const { endpoint } = this.props.feed;
 		api
 			.child(endpoint)
 			.limitToFirst(100)
@@ -42,9 +38,10 @@ class Feed extends Component {
 			});
 	}
 
-	_teardownFeedListener = endpoint => {
+	_teardownFeedListener() {
+		const { endpoint } = this.props.feed;
 		api.child(endpoint).off();
-	};
+	}
 
 	_key = item => String(item);
 
@@ -57,19 +54,21 @@ class Feed extends Component {
 	);
 
 	_handlePress = story => {
-		const { navigation } = this.props;
-
+		const { navigator } = this.props;
 		if (story.url) {
-			navigation.navigate('WebBrowser', { story });
+			navigator.push({ screen: ScreenNames.WebBrowser, passProps: { story } });
 		} else {
-			navigation.navigate('Comments', story);
+			this._handlePressComments(story);
 		}
 	};
 
 	_handlePressComments = story => {
-		const { navigation } = this.props;
-
-		navigation.navigate('Comments', story);
+		const { navigator } = this.props;
+		navigator.push({
+			screen: ScreenNames.Comments,
+			title: pluralize('Comment', story.descendants || 0, true),
+			passProps: { story },
+		});
 	};
 }
 

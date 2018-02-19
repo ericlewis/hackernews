@@ -1,4 +1,3 @@
-import { AppRegistry } from 'react-native';
-import App from './src/App';
+import { run } from './src/App';
 
-AppRegistry.registerComponent('newsyc', () => App);
+run();
