@@ -4,10 +4,9 @@ import config from '../../config';
 import * as firebase from 'firebase';
 
 import StoryCell from '../../components/StoryCell';
-import { WebBrowser, SecureStore } from 'expo';
 
 class Feed extends Component {
-	state = { stories: [] };
+	state = { storyIDs: [] };
 
 	static navigationOptions = ({ navigation }) => ({
 		title: navigation.state.params.key,
@@ -24,10 +23,12 @@ class Feed extends Component {
 	}
 
 	render() {
+		const { storyIDs } = this.state;
+
 		return (
 			<FlatList
-				data={this.state.stories}
-				keyExtractor={item => item}
+				data={storyIDs}
+				keyExtractor={item => String(item)}
 				renderItem={({ item }) => (
 					<StoryCell
 						itemID={item}
@@ -45,8 +46,8 @@ class Feed extends Component {
 			.ref('v0/' + endpoint)
 			.limitToFirst(100)
 			.on('value', snapshot => {
-				const stories = snapshot.val();
-				this.setState({ stories: stories });
+				const storyIDs = snapshot.val();
+				this.setState({ storyIDs });
 			});
 	}
 
@@ -59,21 +60,23 @@ class Feed extends Component {
 
 	_handlePress = story => {
 		if (story.url) {
-			WebBrowser.openBrowserAsync(story.url);
+			//WebBrowser.openBrowserAsync(story.url);
 		} else {
 			this.props.navigation.navigate('Comments', story);
 		}
 
-		SecureStore.setItemAsync(String(story.id), String(story.id)).catch(err =>
-			console.warn(err),
-		);
+		// FIXME: replace this code
+		// SecureStore.setItemAsync(String(story.id), String(story.id)).catch(err =>
+		// 	console.warn(err),
+		// );
 	};
 
 	_handlePressComments = story => {
 		this.props.navigation.navigate('Comments', story);
-		SecureStore.setItemAsync(String(story.id), String(story.id)).catch(err =>
-			console.warn(err),
-		);
+		// FIXME: replace this code
+		// SecureStore.setItemAsync(String(story.id), String(story.id)).catch(err =>
+		// 	console.warn(err),
+		// );
 	};
 }
 

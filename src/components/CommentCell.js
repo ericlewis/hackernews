@@ -3,7 +3,6 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import * as firebase from 'firebase';
 import vagueTime from 'vague-time';
 import HTMLView from 'react-native-htmlview';
-import { WebBrowser, SecureStore } from 'expo';
 
 class CommentCell extends Component {
 	state = { comment: undefined, collapsed: false };
@@ -37,22 +36,7 @@ class CommentCell extends Component {
 						borderColor: 'gray',
 						borderLeftWidth: 1,
 					}}>
-					<TouchableWithoutFeedback
-						onPress={() => {
-							collapseState = !this.state.collapsed;
-
-							if (collapseState === true) {
-								SecureStore.setItemAsync(
-									String(comment.id),
-									String(comment.id),
-								).catch(err => console.warn(err));
-							} else {
-								SecureStore.deleteItemAsync(String(comment.id)).catch(err =>
-									console.warn(err),
-								);
-							}
-							this.setState({ collapsed: collapseState });
-						}}>
+					<TouchableWithoutFeedback onPress={this._toggleCollapse}>
 						{!this.state.collapsed ? (
 							<View>
 								<Text style={{ fontWeight: 'bold', marginBottom: 5 }}>
@@ -82,9 +66,27 @@ class CommentCell extends Component {
 		return null;
 	}
 
-	_handleURL(url) {
-		WebBrowser.openBrowserAsync(url);
-	}
+	_toggleCollapse = () => {
+		collapseState = !this.state.collapsed;
+
+		// FIXME: change this code out with abstraction
+		// if (collapseState === true) {
+		// 	SecureStore.setItemAsync(
+		// 		String(comment.id),
+		// 		String(comment.id),
+		// 	).catch(err => console.warn(err));
+		// } else {
+		// 	SecureStore.deleteItemAsync(String(comment.id)).catch(err =>
+		// 		console.warn(err),
+		// 	);
+		// }
+		this.setState({ collapsed: collapseState });
+	};
+
+	_handleURL = url => {
+		// FIXME: plz
+		//WebBrowser.openBrowserAsync(url);
+	};
 
 	_setupListener(itemID) {
 		firebase
@@ -92,12 +94,13 @@ class CommentCell extends Component {
 			.ref('v0/item/' + itemID)
 			.on('value', snapshot => {
 				const comment = snapshot.val();
-				SecureStore.getItemAsync(String(this.props.itemID)).then(collapsed => {
+				// FIXME: replace this code
+				/*SecureStore.getItemAsync(String(this.props.itemID)).then(collapsed => {
 					this.setState({
 						comment: comment,
 						collapsed: collapsed !== undefined,
 					});
-				});
+				});*/
 			});
 	}
 

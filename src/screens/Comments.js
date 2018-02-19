@@ -2,17 +2,16 @@ import React, { Component } from 'react';
 import { FlatList, Text } from 'react-native';
 import CommentCell from '../components/CommentCell';
 import StoryCell from '../components/StoryCell';
-import { WebBrowser } from 'expo';
 
 class Comments extends Component {
 	state = { rootComments: [] };
 
 	static navigationOptions = ({ navigation }) => ({
-		title: `${navigation.state.params.descendants
-			? navigation.state.params.descendants
-			: 0} ${navigation.state.params.descendants === 1
-			? 'Comment'
-			: 'Comments'}`,
+		title: `${
+			navigation.state.params.descendants
+				? navigation.state.params.descendants
+				: 0
+		} ${navigation.state.params.descendants === 1 ? 'Comment' : 'Comments'}`,
 	});
 
 	render() {
@@ -20,7 +19,7 @@ class Comments extends Component {
 		return (
 			<FlatList
 				data={story.kids}
-				keyExtractor={item => item}
+				keyExtractor={item => String(item)}
 				ListHeaderComponent={
 					<StoryCell
 						itemID={story.id}
@@ -35,7 +34,8 @@ class Comments extends Component {
 	}
 
 	_handlePress = story => {
-		WebBrowser.openBrowserAsync(story.url);
+		// FIXME: plx
+		//WebBrowser.openBrowserAsync(story.url);
 	};
 }
 
