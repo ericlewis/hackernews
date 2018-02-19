@@ -1,8 +1,9 @@
 import React from 'react';
-import { FlatList, Text } from 'react-native';
+import { FlatList } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Feed from './screens/Feed';
 import Comments from './screens/Comments';
+import WebBrowser from './screens/WebBrowser';
 import FeedCell from './components/FeedCell';
 
 const feeds = [
@@ -47,5 +48,8 @@ export default StackNavigator({
 	},
 	Comments: {
 		screen: Comments,
+	},
+	WebBrowser: {
+		screen: WebBrowser,
 	},
 });

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import * as firebase from 'firebase';
+import { View, Text, TouchableWithoutFeedback, StyleSheet } from 'react-native';
+import { withNavigation } from 'react-navigation';
 import vagueTime from 'vague-time';
 import HTMLView from 'react-native-htmlview';
+import { api } from '../config';
 
 class CommentCell extends Component {
 	state = { comment: undefined, collapsed: false };
@@ -16,7 +17,7 @@ class CommentCell extends Component {
 	}
 
 	render() {
-		const comment = this.state.comment;
+		const { comment } = this.state;
 
 		if (comment) {
 			if (comment.deleted) {
@@ -28,33 +29,25 @@ class CommentCell extends Component {
 			});
 
 			return (
-				<View
-					style={{
-						flex: 1,
-						paddingHorizontal: 12,
-						marginTop: 15,
-						borderColor: 'gray',
-						borderLeftWidth: 1,
-					}}>
+				<View style={styles.container}>
 					<TouchableWithoutFeedback onPress={this._toggleCollapse}>
 						{!this.state.collapsed ? (
 							<View>
-								<Text style={{ fontWeight: 'bold', marginBottom: 5 }}>
+								<Text style={styles.title}>
 									[‒] {comment.by}
-									<Text style={{ fontWeight: 'normal' }}> {timeAgo}</Text>
+									<Text style={styles.timeAgo}> {timeAgo}</Text>
 								</Text>
 								<HTMLView value={comment.text} onLinkPress={this._handleURL} />
-								{comment.kids
-									? comment.kids.map(comment => (
-											<CommentCell key={comment} itemID={comment} />
-										))
-									: null}
+								{comment.kids &&
+									comment.kids.map(comment => (
+										<CommentCell key={comment} itemID={comment} />
+									))}
 							</View>
 						) : (
 							<View>
-								<Text style={{ fontWeight: 'bold', opacity: 0.4 }}>
+								<Text style={[styles.title, styles.collapsed]}>
 									[+] {comment.by}
-									<Text style={{ fontWeight: 'normal' }}> {timeAgo}</Text>
+									<Text style={styles.timeAgo}> {timeAgo}</Text>
 								</Text>
 							</View>
 						)}
@@ -67,49 +60,38 @@ class CommentCell extends Component {
 	}
 
 	_toggleCollapse = () => {
-		collapseState = !this.state.collapsed;
-
-		// FIXME: change this code out with abstraction
-		// if (collapseState === true) {
-		// 	SecureStore.setItemAsync(
-		// 		String(comment.id),
-		// 		String(comment.id),
-		// 	).catch(err => console.warn(err));
-		// } else {
-		// 	SecureStore.deleteItemAsync(String(comment.id)).catch(err =>
-		// 		console.warn(err),
-		// 	);
-		// }
-		this.setState({ collapsed: collapseState });
+		const { collapsed } = this.state;
+		this.setState({ collapsed: !collapsed });
 	};
 
 	_handleURL = url => {
-		// FIXME: plz
-		//WebBrowser.openBrowserAsync(url);
+		const { navigation } = this.props;
+		navigation.navigate('WebBrowser', { url });
 	};
 
-	_setupListener(itemID) {
-		firebase
-			.database()
-			.ref('v0/item/' + itemID)
-			.on('value', snapshot => {
-				const comment = snapshot.val();
-				// FIXME: replace this code
-				/*SecureStore.getItemAsync(String(this.props.itemID)).then(collapsed => {
-					this.setState({
-						comment: comment,
-						collapsed: collapsed !== undefined,
-					});
-				});*/
-			});
-	}
+	_setupListener = itemID => {
+		api.child(`item/${itemID}`).on('value', snapshot => {
+			const comment = snapshot.val();
+			this.setState({ comment });
+		});
+	};
 
-	_teardownListener(itemID) {
-		firebase
-			.database()
-			.ref('v0/item/' + itemID)
-			.off();
-	}
+	_teardownListener = itemID => {
+		api.child(`item/${itemID}`).off();
+	};
 }
 
-export default CommentCell;
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		paddingHorizontal: 12,
+		marginTop: 15,
+		borderColor: 'gray',
+		borderLeftWidth: 1,
+	},
+	title: { fontWeight: 'bold', paddingBottom: 5 },
+	timeAgo: { fontWeight: 'normal' },
+	collapsed: { opacity: 0.4 },
+});
+
+export default withNavigation(CommentCell);

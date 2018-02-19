@@ -14,8 +14,9 @@
 		"eslint-plugin-react": "^7.5.1",
 		"eslint-plugin-react-native": "^3.2.0",
 		"eslint-plugin-rulesdir": "^0.1.0",
-		"lint-staged": "^6.0.0",
 		"jest-expo": "^22.0.0",
+		"lint-staged": "^6.0.0",
+		"prettier": "^1.8.2",
 		"react-test-renderer": "16.0.0-beta.5"
 	},
 	"main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
@@ -31,12 +32,23 @@
 		"preset": "jest-expo"
 	},
 	"lint-staged": {
-		"+(package.json|yarn.lock)": ["node ./scripts/yarn-check.js"],
-		"src/**/*.js": ["eslint"]
+		"+(package.json|yarn.lock)": [
+			"node ./scripts/yarn-check.js"
+		],
+		"src/**/*.js": [
+			"eslint"
+		]
+	},
+	"prettier": {
+		"singleQuote": true,
+		"useTabs": true,
+		"jsxBracketSameLine": true,
+		"trailingComma": "all"
 	},
 	"dependencies": {
 		"expo": "^22.0.2",
 		"firebase": "^4.6.2",
+		"pluralize": "^7.0.0",
 		"react": "16.2.0",
 		"react-native": "0.53.0",
 		"react-native-htmlview": "^0.12.1",

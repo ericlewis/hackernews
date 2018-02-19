@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
-import { FlatList, Text } from 'react-native';
+import { FlatList } from 'react-native';
+import pluralize from 'pluralize';
 import CommentCell from '../components/CommentCell';
 import StoryCell from '../components/StoryCell';
+import { FooterSpacer } from '../components/FooterSpacer';
 
 class Comments extends Component {
-	state = { rootComments: [] };
-
 	static navigationOptions = ({ navigation }) => ({
-		title: `${
-			navigation.state.params.descendants
-				? navigation.state.params.descendants
-				: 0
-		} ${navigation.state.params.descendants === 1 ? 'Comment' : 'Comments'}`,
+		title: pluralize('Comment', navigation.state.params.descendants || 0, true),
 	});
 
 	render() {
@@ -19,24 +15,29 @@ class Comments extends Component {
 		return (
 			<FlatList
 				data={story.kids}
-				keyExtractor={item => String(item)}
-				ListHeaderComponent={
-					<StoryCell
-						itemID={story.id}
-						hideCommentBubble={true}
-						detailMode={true}
-						onPress={this._handlePress}
-					/>
-				}
-				renderItem={({ item }) => <CommentCell itemID={item} />}
+				keyExtractor={this._key}
+				ListHeaderComponent={this._header(story)}
+				ListFooterComponent={FooterSpacer}
+				renderItem={this._renderItem}
 			/>
 		);
 	}
 
-	_handlePress = story => {
-		// FIXME: plx
-		//WebBrowser.openBrowserAsync(story.url);
-	};
+	_header = story => (
+		<StoryCell
+			itemID={story.id}
+			hideCommentBubble
+			detailMode
+			onPress={this._handlePress}
+		/>
+	);
+
+	_key = item => String(item);
+
+	_renderItem = ({ item }) => <CommentCell itemID={item} />;
+
+	_handlePress = story =>
+		this.props.navigation.navigate('WebBrowser', { story });
 }
 
 export default Comments;

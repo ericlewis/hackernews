@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import * as firebase from 'firebase';
+import { withNavigation } from 'react-navigation';
 import vagueTime from 'vague-time';
 import parse from 'url-parse';
 import HTMLView from 'react-native-htmlview';
+import { api } from '../config';
 
 class StoryCell extends Component {
 	state = { story: undefined, read: false };
 
 	componentDidMount() {
-		const { itemID } = this.props;
-		this._setupListener(itemID);
+		this._setupListener();
 	}
 
 	componentWillUnmount() {
-		const { itemID } = this.props;
-		this._teardownListener(itemID);
+		this._teardownListener();
 	}
 
 	render() {
@@ -24,6 +23,8 @@ class StoryCell extends Component {
 		if (story) {
 			const { title, url, score, time, by, text } = story;
 			const { read } = this.state;
+			const { detailMode } = this.props;
+			const { hideCommentBubble } = this.props;
 
 			return (
 				<View style={styles.container}>
@@ -32,9 +33,7 @@ class StoryCell extends Component {
 						style={styles.storyContainer}
 						onPress={this._pressedStory}>
 						<View
-							style={{
-								opacity: read && !this.props.hideCommentBubble ? 0.3 : 1.0,
-							}}>
+							style={read && !hideCommentBubble ? styles.read : styles.unread}>
 							<Text style={styles.titleContainer}>
 								{title}
 								{url && (
@@ -45,7 +44,7 @@ class StoryCell extends Component {
 								{score} points by {by} {this._timeAgo(time)}
 							</Text>
 							{text &&
-								this.props.detailMode && (
+								detailMode && (
 									<HTMLView
 										style={styles.html}
 										value={text}
@@ -54,43 +53,45 @@ class StoryCell extends Component {
 								)}
 						</View>
 					</TouchableOpacity>
-					{this.props.hideCommentBubble ? null : story.type === 'story' ||
-					story.type === 'poll' ? (
-						<TouchableOpacity onPress={this._pressedComments}>
-							<View style={styles.commentBubble}>
-								<Text style={styles.commentCount}>{story.descendants}</Text>
-							</View>
-						</TouchableOpacity>
-					) : null}
+					{this._commentBubble(story)}
 				</View>
 			);
 		}
 
-		//TODO:
-		// empty view prob should go here.
 		return null;
 	}
 
-	_setupListener(itemID) {
-		firebase
-			.database()
-			.ref('v0/item/' + itemID)
-			.on('value', snapshot => {
-				const story = snapshot.val();
-				this.setState({ story });
-				// FIXME: replace this code
-				// SecureStore.getItemAsync(String(this.props.itemID)).then(read => {
-				// 	this.setState({ story: story, read: read !== undefined });
-				// });
-			});
-	}
+	_setupListener = () => {
+		const { itemID } = this.props;
+		api.child(`item/${itemID}`).on('value', snapshot => {
+			const story = snapshot.val();
+			this.setState({ story });
+		});
+	};
 
-	_teardownListener(itemID) {
-		firebase
-			.database()
-			.ref('v0/item/' + itemID)
-			.off();
-	}
+	_teardownListener = () => {
+		const { itemID } = this.props;
+		api.child(`item/${itemID}`).off();
+	};
+
+	_commentBubble = story => {
+		const { hideCommentBubble } = this.props;
+		const { type } = story;
+
+		if (hideCommentBubble) {
+			return null;
+		} else if (type !== 'story' || type !== 'poll') {
+			return (
+				<TouchableOpacity onPress={this._pressedComments}>
+					<View style={styles.commentBubble}>
+						<Text style={styles.commentCount}>{story.descendants}</Text>
+					</View>
+				</TouchableOpacity>
+			);
+		}
+
+		return null;
+	};
 
 	_pressedStory = () => {
 		const { story } = this.state;
@@ -105,15 +106,14 @@ class StoryCell extends Component {
 	};
 
 	_pressedURL = url => {
-		// FIXME: plez
-		//WebBrowser.openBrowserAsync(url);
+		const { navigation } = this.props;
+		navigation.navigate('WebBrowser', { url });
 	};
 
-	_timeAgo(time) {
-		return vagueTime.get({
+	_timeAgo = time =>
+		vagueTime.get({
 			to: time * 1000,
 		});
-	}
 }
 
 const styles = StyleSheet.create({
@@ -125,6 +125,12 @@ const styles = StyleSheet.create({
 		paddingVertical: 17,
 		borderBottomColor: 'white',
 		borderBottomWidth: 1,
+	},
+	read: {
+		opacity: 0.3,
+	},
+	unread: {
+		opacity: 1.0,
 	},
 	storyContainer: {
 		flex: 1,
@@ -148,4 +154,4 @@ const styles = StyleSheet.create({
 	commentCount: { fontWeight: 'bold' },
 });
 
-export default StoryCell;
+export default withNavigation(StoryCell);
