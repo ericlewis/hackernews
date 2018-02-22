@@ -53,6 +53,7 @@
 		"react": "16.2.0",
 		"react-native": "0.53.0",
 		"react-native-htmlview": "^0.12.1",
+		"react-native-keyboard-spacer": "^0.4.1",
 		"react-native-navigation": "^1.1.381",
 		"react-navigation": "^1.0.0-beta.19",
 		"url-parse": "^1.2.0",

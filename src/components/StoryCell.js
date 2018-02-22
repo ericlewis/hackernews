@@ -145,7 +145,6 @@ const styles = StyleSheet.create({
 	info: { marginTop: 5, color: 'grey', fontSize: 13 },
 	html: { marginTop: 10 },
 	commentBubble: {
-		marginLeft: 10,
 		padding: 8,
 		backgroundColor: 'white',
 		borderRadius: 8,
